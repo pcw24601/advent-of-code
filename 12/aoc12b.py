@@ -1,5 +1,6 @@
 import re
 from pprint import pprint
+from functools import cache
 
 fname = r'12/input.txt'
 # fname = r'12/test.txt'
@@ -15,12 +16,12 @@ for ln in input_list:
     line += '.'  # add '.' to end to help regex later
     lengths = lengths + f',{lengths}'*4
     lengths = lengths.split(',')
-    lengths = [int(length) for length in lengths]
+    lengths = tuple([int(length) for length in lengths])
     this_dict = dict(line=line, lengths=lengths)
     puzzle_def.append(this_dict)
     # print(line.split('?', maxsplit=1))
 
-
+@cache
 def recursive_count_matches(sub_string, lengths):
     sub_string = sub_string.lstrip('.')
     if len(lengths) == 0:
@@ -48,7 +49,6 @@ def recursive_count_matches(sub_string, lengths):
     existing_number_groups = len(sub_string.replace('.', ' ').split())
     if num_springs > (num_hashes + num_qs + existing_number_groups - groups_needed):
         return 0
-
     
     first_char = sub_string[0]
     if first_char == '#':
@@ -70,9 +70,9 @@ def recursive_count_matches(sub_string, lengths):
 
 total = 0
 for i, line_dict in enumerate(puzzle_def):
-    print(f'Checking line {i+1}, {line_dict["line"]}')
+    # print(f'Checking line {i+1}, {line_dict["line"]}')
     this_sum = recursive_count_matches(line_dict['line'], line_dict['lengths'])
-    print(this_sum)
+    # print(this_sum)
     total += this_sum
 
 print(total)
