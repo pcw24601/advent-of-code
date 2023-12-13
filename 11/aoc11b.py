@@ -8,7 +8,6 @@ distance_factor = 1e6
 with open(fname, 'r') as fp:
     input_list = fp.readlines()
 
-# line_num = 0
 original_coords = []
 
 galaxy = re.compile('#')
