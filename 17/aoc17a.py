@@ -58,6 +58,7 @@ class Route():
 with open(fname, 'r') as fp:
     lines = fp.readlines()
 
+print('Loading route')
 tiles_dict = {}
 for line_num, ln in enumerate(lines):
     for col_number, heat_loss in enumerate(ln.strip()):
@@ -66,52 +67,62 @@ last_line = line_num
 last_col = col_number  
 
 list_of_routes = [Route(tiles_dict[(0,0)].heat_loss)]
-total_heat_loss = set()
+# total_heat_loss = set()
 moves_dict = {}
+print('Starting path search')
+debug_loop_number = 0
 
 while True:
-    new_routes = []
-    for route in list_of_routes:
-
-        # Check on a tile
-        this_tile = tiles_dict.get(route.position, None)
-        if this_tile is None:
-            continue
-        
-        # Add heat_loss
-        route.heat_loss += this_tile.heat_loss
-        # Check if on end position
-        if route.position == (last_line, last_col):
-            total_heat_loss.add(route.heat_loss)
-            continue
-        # Add to moves set--check if we're on a loop AND have a higher heat loss
-        route_loop_check = (route.position, route.recent_path)
-        if route_loop_check in moves_dict:
-            if moves_dict[route_loop_check] < route.heat_loss:
-                continue
-        moves_dict[route_loop_check] = route.heat_loss
-
-        # Generate new positions
-        possible_moves = set('rlud')
-        recent_path = route.recent_path
-        if recent_path:
-            possible_moves.discard(reverse_direction[recent_path[-1]])  # cannot double back
-        if len(recent_path) == 3:
-            # check for going for three steps in a row
-            if len(set(recent_path)) == 1:
-                possible_moves.discard(recent_path[-1])
-        for direction in possible_moves:
-            new_routes.append(copy.deepcopy(route).move(direction))
-    
-    if len(total_heat_loss) > 0:
-        # have found one route. If other routes are longer, discard
-        new_routes = [this_route for this_route in new_routes if this_route.heat_loss < min(total_heat_loss)]
-    new_routes.sort(key=lambda route: route.heat_loss)
-    list_of_routes = new_routes
+    debug_loop_number += 1
     if not list_of_routes:
+        print('All routes checked')
         break
+    route = list_of_routes.pop(0)
+    if not debug_loop_number % 1000:
+        # print update info
+        print(f'Loop: {debug_loop_number}, routes on list: {len(list_of_routes)}, heat_loss = {route.heat_loss}')
 
-print(min(total_heat_loss))
+    # Check on a tile
+    this_tile = tiles_dict.get(route.position, None)
+    if this_tile is None:
+        continue
+    
+    # Add heat_loss
+    route.heat_loss += this_tile.heat_loss
+    # Check if on end position
+    if route.position == (last_line, last_col):
+        total_heat_loss = route.heat_loss
+        break
+    # Add to moves set--check if we're on a loop AND have a higher heat loss
+    route_loop_check = (route.position, route.recent_path)
+    if route_loop_check in moves_dict:
+        if moves_dict[route_loop_check] < route.heat_loss:
+            continue
+    moves_dict[route_loop_check] = route.heat_loss
+
+    # Generate new positions
+    possible_moves = set('rlud')
+    recent_path = route.recent_path
+    if recent_path:
+        possible_moves.discard(reverse_direction[recent_path[-1]])  # cannot double back
+    if len(recent_path) == 3:
+        # check for going for three steps in a row
+        if len(set(recent_path)) == 1:
+            possible_moves.discard(recent_path[-1])
+    for direction in possible_moves:
+        list_of_routes.append(copy.deepcopy(route).move(direction))
+
+    list_of_routes.sort(key=lambda route: route.heat_loss)
+
+# if len(total_heat_loss) > 0:
+#     # have found one route. If other routes are longer, discard
+#     new_routes = [this_route for this_route in new_routes if this_route.heat_loss < min(total_heat_loss)]
+# new_routes.sort(key=lambda route: route.heat_loss)
+# list_of_routes = new_routes
+# if not list_of_routes:
+#     break
+
+print(total_heat_loss)
 
 
 
