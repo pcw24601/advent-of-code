@@ -1,3 +1,5 @@
+# Post solution note: could actually be done quite nicely with two counters, one for each list,
+# and the result being a sum of n1 * n1_freq * n2_freq
 from collections import Counter
 
 fname = 'input.txt'
