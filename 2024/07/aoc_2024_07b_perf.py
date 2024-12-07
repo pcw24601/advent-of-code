@@ -1,4 +1,5 @@
-# Process time: 9.99 seconds.
+# Original process time: 9.99 seconds.
+# This recursive version: 1.63 seconds
 import itertools
 import operator
 from time import time
@@ -6,18 +7,21 @@ from time import time
 def concat_numbers(a: int, b: int) -> int:
     return int(str(a) + str(b))
 
+def check_sub_line(target, current_total, other_numbers):
+    if current_total > target:
+        # early return, operations can only increase total
+        return 0
+    if not other_numbers:
+        return target if current_total == target else 0
+    for this_operator in (operator.add, operator.mul, concat_numbers):
+        new_total = this_operator(current_total, other_numbers[0])
+        if this_calibration:=check_sub_line(target, new_total, other_numbers[1:]):
+            return this_calibration
+    return 0
 
 def check_line(line: list[int]) -> int:
     target, start_number, *other_numbers = line
-    num_ops = len(other_numbers)
-    operator_list = [operator.add, operator.mul, concat_numbers]
-    for operator_sequence in itertools.product(operator_list, repeat=num_ops):
-        this_total = start_number
-        for this_op, next_number in zip(operator_sequence, other_numbers):
-            this_total = this_op(this_total, next_number)
-        if this_total == target:
-            return this_total
-    return 0
+    return check_sub_line(target, start_number, tuple(other_numbers))
 
 
 def main():

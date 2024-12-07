@@ -1,5 +1,8 @@
-from pprint import pprint
-from typing import Tuple
+# Post solution note: This is quite messy. My initial thought was to use regex to change all the
+# '.'s or 'X's between '^' and '#' into 'X' in one command, but I couldn't figure out how to do
+# this. Next, I planned to change the nth element in a string using `this_string[n]='X'`. However,
+# as Python strings are immutable, this is not possible. An ugly recreating of the string is used
+# instead. Would have been better to just use a list of lists of chars (see part 2).
 
 fname = 'input.txt'
 # fname='test.txt'
@@ -33,17 +36,19 @@ row, col = find_guard(grid)
 while True:
     grid[row] = grid[row][:col] + 'X' + grid[row][col+1:]  # replace guard with 'X'
     if col == 0:
+        # On edge of grid and about to leave
         grid[row] = grid[row][:col] + 'X' + grid[row][col+1:]
         break
     if grid[row][col-1] == '#':
+        # Need to turn
         grid[row] = grid[row][:col] + '^' + grid[row][col+1:]
         grid = rotate(grid)
         row, col = find_guard(grid)
         continue
     if grid[row][col-1] == '.':
+        # Keep going straight
         grid[row] = grid[row][:col] + 'X' + grid[row][col+1:]
     col -= 1
 
 answer = sum(map(lambda s: s.count('X'), grid))
 print(f'{answer=}')
-

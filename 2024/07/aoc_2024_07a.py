@@ -14,6 +14,8 @@ for line in lines:
 
 def check_line(line: list[int]) -> int:
     target, start_number, *other_numbers = line
+    # We need an operator ('+' or '*') before each element of other_numbers. Loop through all
+    # possible permutations of these operators, with an early return if we get the target.
     num_ops = len(other_numbers)
     for operator_sequence in itertools.product([operator.add, operator.mul], repeat=num_ops):
         this_total = start_number
