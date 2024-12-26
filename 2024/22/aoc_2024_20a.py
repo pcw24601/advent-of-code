@@ -36,7 +36,6 @@ def main():
     pass
 
 
-
 if __name__ == '__main__':
     start_time = time.process_time()
     main()
